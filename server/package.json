@@ -1,0 +1,11 @@
+{
+  "name": "toodle-server",
+  "version": "1.0.0",
+  "description": "Toodle server side",
+  "main": "src/index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dbelik",
+  "license": "MIT"
+}
