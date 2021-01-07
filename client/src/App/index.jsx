@@ -2,13 +2,19 @@ import React, { Fragment } from "react";
 import anime from "animejs";
 import "normalize.css";
 
+import "./BaseStyles.css";
+
 import Routes from "./Routes";
 
 function hideLoadingScreen() {
+  const animationDuration = 100;
+
   anime({
     targets: "#loading-screen",
     opacity: "0",
-    duration: 1000
+    duration: animationDuration,
+    easing: "linear",
+    complete: () => document.getElementById("loading-screen").style.display = "none"
   });
 }
 

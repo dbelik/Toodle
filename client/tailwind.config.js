@@ -14,6 +14,14 @@ module.exports = {
       primaryText: "#131516",
       secondaryText: "#555f61"
     },
+    sizes: {
+      headers: {
+        h1: "42px",
+        h2: "38px",
+        h3: "24px",
+        h4: "18px"
+      }
+    },
     extend: {},
   },
   variants: {
