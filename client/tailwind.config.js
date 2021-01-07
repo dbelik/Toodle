@@ -10,13 +10,15 @@ module.exports = {
     },
     colors: {
       primary: "#68ACB5",
+      primaryContent: "#FFFFFF",
+      primaryInteract: "#5a949c",
 
-      primaryText: "#131516",
+      text: "#131516",
       secondaryText: "#555f61"
     },
     sizes: {
       headers: {
-        h1: "42px",
+        h1: "48px",
         h2: "38px",
         h3: "24px",
         h4: "18px"

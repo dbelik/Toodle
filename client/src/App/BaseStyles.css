@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+    /* Reset tags */
+    :root { font-size: 16px; }
+    * { box-sizing: border-box; }
+
+    body, a { color: theme("colors.text"); }
     h1 { font-size: theme("sizes.headers.h1"); }
     h2 { font-size: theme("sizes.headers.h2"); }
+
+    /* Add utility classes */
+    .color-default-text { color: theme("colors.text"); }
+
+    .color-primary { color: theme("colors.primary"); }
+    .color-primary-content { color: theme("colors.primaryContent"); }
+    
+    .bg-primary { background-color: theme("colors.primary"); }
+    .bg-primary-interact { background-color: theme("colors.primaryInteract"); }
 }
