@@ -8,8 +8,10 @@
     * { box-sizing: border-box; }
 
     body, a { color: theme("colors.text"); }
-    h1 { font-size: theme("sizes.headers.h1"); }
-    h2 { font-size: theme("sizes.headers.h2"); }
+    h1 { font-size: theme("sizes.headers.h1"); margin-bottom: theme("spacings.margins.h1"); }
+    h2 { font-size: theme("sizes.headers.h2"); margin-bottom: theme("spacings.margins.h2"); }
+    h3 { font-size: theme("sizes.headers.h3"); margin-bottom: theme("spacings.margins.h3"); }
+    button, button:hover, button:focus { border: none; outline: none; }
 
     /* Add utility classes */
     .color-default-text { color: theme("colors.text"); }
@@ -19,4 +21,15 @@
     
     .bg-primary { background-color: theme("colors.primary"); }
     .bg-primary-interact { background-color: theme("colors.primaryInteract"); }
+
+    .border-color-primary { border-color: theme("colors.borderPrimary"); }
+
+    .content-container { 
+        width: min(theme("sizes.container"), 100%);
+        margin: 0px auto;
+    }
+
+    .-translate-x-half { transform: translateX(-50%); }
+
+    .top-6-over-5 { top: 120%; }
 }
