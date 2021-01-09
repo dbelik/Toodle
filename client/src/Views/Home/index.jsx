@@ -1,11 +1,11 @@
-import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import React from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import PrimaryLink from "../../Components/Misc/PrimaryLink";
 
 export default function Home() {
     return (
-        <Fragment>
+        <HelmetProvider>
             <Helmet>
                 <title>Toodle | Home</title>
             </Helmet>
@@ -14,6 +14,6 @@ export default function Home() {
                 <h1 className="color-primary">Toodle</h1>
                 <PrimaryLink href="/workplace">Start working</PrimaryLink>
             </div>
-        </Fragment>
+        </HelmetProvider>
     );
 }

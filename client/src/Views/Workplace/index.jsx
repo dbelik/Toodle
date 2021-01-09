@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import Editor from "../../Components/Workspace/Editor";
 
@@ -17,6 +18,11 @@ export default function Workplace() {
     const [content, setContent] = useState("");
 
     return (
-        <Editor onChange={setContent} value={content} />
+        <HelmetProvider>
+            <Helmet>
+                <title>Toodle | Workplace</title>
+            </Helmet>
+            <Editor onChange={setContent} value={content} />
+        </HelmetProvider>
     );
 }

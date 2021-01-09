@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 import { Controlled as CodeMirror } from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css';
