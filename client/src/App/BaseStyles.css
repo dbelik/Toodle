@@ -7,6 +7,9 @@
     :root {
         --primary: theme("colors.primary");
         --primary-content: theme("colors.primaryContent");
+        --primary-interact: theme("colors.primaryInteract");
+
+        --fast: 0.1s;
     }
 
     /* Reset tags */
