@@ -1,0 +1,11 @@
+.CodeMirror {
+    height: 100vh;
+}
+
+.CodeMirror-linenumbers {
+    background: var(--primary);
+}
+
+.CodeMirror-linenumber {
+    color: var(--primary-content);
+}

@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+    /* Define variables */
+    :root {
+        --primary: theme("colors.primary");
+        --primary-content: theme("colors.primaryContent");
+    }
+
     /* Reset tags */
     :root { font-size: 16px; }
     * { box-sizing: border-box; }
