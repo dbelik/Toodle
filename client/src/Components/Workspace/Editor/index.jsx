@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { Controlled as CodeMirror } from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/markdown/markdown';
 import './toodle-theme.css';
 
 function onEditorChange(editor, data, value, onChange) {
@@ -21,7 +22,8 @@ export default function Editor({ onChange, value }) {
                 value={value}
                 options={{
                     lineWrapping: true,
-                    lineNumbers: true
+                    lineNumbers: true,
+                    mode: "markdown"
                 }} />
         </Fragment>
     )
