@@ -9,8 +9,6 @@
   "author": "dbelik",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "https": "^1.0.0",
     "peer": "^0.6.1"
   },
   "devDependencies": {

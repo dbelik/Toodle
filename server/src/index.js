@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-const express = require('express');
-const https = require('https');
 const fs = require("fs");
 const path = require("path");
 const peer = require("peer");
@@ -11,16 +9,13 @@ const constants = require("./constants");
 initAll();
 
 function initAll() {
-    initApp();
-}
-
-function initApp() {
-    const app = express();
-
-    const server = https.createServer(createCredentials(), app);
-    server.listen(443, () => console.log('listening'));
-
-    app.use("/peerjs", peer.ExpressPeerServer(server, { debug: true }));
+    const server = peer.PeerServer({
+        port: constants.port,
+        path: constants.path,
+        ssl: createCredentials()
+    }, () => console.log(`Server is running on "localhost:${constants.port}". Test it by going to "localhost:${constants.port}${constants.path}".`));
+    server.on("connection", (client) => console.log("connect - " + client.id));
+    server.on("disconnect", (client) => console.log("disconnect - " + client.id));
 }
 
 function createCredentials() {
