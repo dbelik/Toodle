@@ -6,38 +6,41 @@ import Editor from "../../Components/Workspace/Editor";
 import Menu from "../../Components/Workspace/Menu";
 
 // Utilities
-function createPeer() {
+function initWorkplace(setPeer, setConnection, setContent) {
     const peer = new Peer({
         host: "localhost",
         port: 9000,
         path: "/doc",
         secure: true
     });
-    initPeerEventHandlers(peer);
-    return peer;
+    initPeerEventHandlers(peer, setConnection, setContent);
+    setPeer(peer);
 }
 
-function initPeerEventHandlers(peer) {
-    peer.on("open", () => peerOnOpenHandler(peer));
-    peer.on("connection", () => peerOnConnectionHandler(peer));
+function initPeerEventHandlers(peer, setConnection, setContent) {
+    peer.on("open", () => peerOnOpenHandler(peer, setConnection, setContent));
+    peer.on("connection", (connection) => peerOnConnectionHandler(connection, setConnection, setContent));
     peer.on("disconnected", () => peerOnDisconnectedHandler(peer));
     peer.on("error", (error) => peerOnErrorHandler(peer, error));
 }
 
-// Event handlers
-function peerOnOpenHandler(peer) {
-    console.log(`Peer is open with id - ${peer.id}`);
-    const connectId = getPeerId();
-    if (connectId) initConnectionEventHandlers(peer, connectId);
-}
-
-function initConnectionEventHandlers(peer, connectId) {
+function initConnectionEventHandlers(peer, connectId, setConnection, setContent) {
     const connect = peer.connect(connectId);
-    connect.on("open", () => console.log('Open'));
+    connect.on("open", () => setConnection(connect));
+    connect.on("data", (data) => setContent(data));
 }
 
-function peerOnConnectionHandler(peer) {
-    console.log("Connection established");
+// Event handlers
+// - peer events
+function peerOnOpenHandler(peer, setConnection, setContent) {
+    const connectId = getPeerId();
+    if (connectId) initConnectionEventHandlers(peer, connectId, setConnection, setContent);
+}
+
+function peerOnConnectionHandler(connection, setConnection, setContent) {
+    // connection.on("open", () => connection.send('hi'));
+    connection.on("data", (data) => setContent(data));
+    setConnection(connection);
 }
 
 function peerOnDisconnectedHandler(peer) {
@@ -45,7 +48,18 @@ function peerOnDisconnectedHandler(peer) {
 }
 
 function peerOnErrorHandler(peer, error) {
-    console.log(error);
+    switch (error.type) {
+        case "peer-unavailable": { console.error("Cannot connect to the given peer"); break; }
+        default: console.error(error);
+    }
+}
+
+// - editor events:
+function contentChange(newContent, setContent, connection) {
+    setContent(newContent);
+    // If connection is open, send data to peers.
+    if (connection)
+        connection.send(newContent);
 }
 
 // Event handler helpers
@@ -58,8 +72,9 @@ function getPeerId() {
 export default function Workplace() {
     const [content, setContent] = useState("");
     const [peer, setPeer] = useState(null);
+    const [connection, setConnection] = useState(null);
 
-    useEffect(() => setPeer(createPeer()), []);
+    useEffect(() => initWorkplace(setPeer, setConnection, setContent), []);
 
     return (
         <HelmetProvider>
@@ -68,7 +83,7 @@ export default function Workplace() {
             </Helmet>
 
             <Menu peer={peer} />
-            <Editor onChange={setContent} value={content} />
+            <Editor onChange={(content) => contentChange(content, setContent, connection)} value={content} />
         </HelmetProvider>
     );
 }

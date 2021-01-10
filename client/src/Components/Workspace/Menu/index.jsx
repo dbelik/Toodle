@@ -4,7 +4,7 @@ import SimpleButton from '../../Misc/SimpleButton';
 
 function getShareLink(peer) {
     const connectId = getConnectId(peer);
-    return `https://toodle.com:3000/workplace?${connectId}`;
+    return `${window.location.protocol}//${window.location.host}/workplace?${connectId}`;
 }
 
 async function copyShareLink(peer) {
