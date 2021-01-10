@@ -10,10 +10,11 @@ initAll();
 
 function initAll() {
     const server = peer.PeerServer({
+        host: constants.host,
         port: constants.port,
         path: constants.path,
         ssl: createCredentials()
-    }, () => console.log(`Server is running on "localhost:${constants.port}". Test it by going to "localhost:${constants.port}${constants.path}".`));
+    }, () => console.log(`Server is running on "https://${constants.host}:${constants.port}".`));
     server.on("connection", (client) => console.log("connect - " + client.id));
     server.on("disconnect", (client) => console.log("disconnect - " + client.id));
 }

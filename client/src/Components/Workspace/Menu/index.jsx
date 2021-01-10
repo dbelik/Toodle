@@ -14,7 +14,7 @@ async function copyShareLink(peer) {
 
 function getPeerId() {
     const search = window.location.search;
-    return !search ? null : search.substring(1);
+    return !search || search === "" ? null : search.substring(1);
 }
 
 function getConnectId(peer) {

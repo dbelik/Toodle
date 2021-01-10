@@ -8,7 +8,7 @@ import Menu from "../../Components/Workspace/Menu";
 // Utilities
 function initWorkplace(setPeer, setConnection, setContent) {
     const peer = new Peer({
-        host: "localhost",
+        host: "192.168.0.104",
         port: 9000,
         path: "/doc",
         secure: true
