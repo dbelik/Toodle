@@ -7,7 +7,7 @@ import Menu from "../../Components/Workspace/Menu";
 import WorkplaceState from "./WorkplaceState";
 
 export default function Workplace() {
-    const [content, setContent] = useState("");
+    const [_, setContent] = useState("");
 
     const [workplace, setWorkplace] = useState(null);
 
@@ -20,7 +20,7 @@ export default function Workplace() {
             </Helmet>
 
             <Menu peer={workplace?.peer} />
-            <Editor onChange={(content) => workplace?.updateContent(content)} value={content} />
+            <Editor onChange={(content) => workplace?.updateContent(content)} value={workplace?.content} />
         </HelmetProvider>
     );
 }

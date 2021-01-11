@@ -12,6 +12,8 @@ export default function WorkplaceState(setContentCallback) {
     // Fields:
     this.content = "";
     this.peer = createPeer(this);
+    
+    this.peerIds = [];
 }
 
 // Methods.
@@ -54,15 +56,33 @@ function createPeer(workplace) {
 
     peer.on("open", () => peerOnOpenHandler(workplace));
     peer.on("connection", (connection) => peerOnConnectionHandler(workplace, connection));
-    peer.on("disconnected", () => peerOnDisconnectedHandler(peer));
-    peer.on("error", (error) => peerOnErrorHandler(peer, error));
+    peer.on("disconnected", () => peerOnDisconnectedHandler(workplace));
+    peer.on("close", () => console.log("Close"));
+    peer.on("error", (error) => peerOnErrorHandler(workplace, error));
     return peer;
+}
+
+function send(workplace, data, senderConnection = undefined) {
+    console.log(data);
+    workplace.sendToPeers(data, [senderConnection]);
+}
+
+function close(workplace, connection) {
+    console.log("close");
+    workplace.peerIds.splice(workplace.peerIds.indexOf(connection.peer), 1);
+    send(workplace, workplace.peerIds);
+}
+
+function receive(workplace, data, connection = undefined) {
+    console.log(data);
+    send(workplace, data, connection);
 }
 
 // Add sender event handlers.
 function initConnectionEventHandlers(workplace, connection) {
-    connection.on("open", () => workplace.peer.connection = connection);
-    connection.on("data", (data) => connectionOnDataHandler(workplace, connection, data));
+    connection.on("open", () => console.log("Connection is open"));
+    connection.on("data", (data) => receive(workplace, data, connection));
+    connection.on("close", () => console.log("close"));
 }
 
 // Event handlers
@@ -73,27 +93,23 @@ function peerOnOpenHandler(workplace) {
 }
 
 function peerOnConnectionHandler(workplace, connection) {
-    connection.on("data", (data) => connectionOnDataHandler(workplace, connection, data));
-    workplace.peer.connection = connection;
+    // Keep track of connected peer.
+    workplace.peerIds.push(connection.peer);
+
+    connection.on("data", (data) => receive(workplace, data, connection));
+    connection.on("close", () => close(workplace, connection));
+
+    // Some time has to pass before sending message to the peer.
+    setTimeout(() => send(workplace, workplace.peerIds), 1);
 }
 
-function peerOnDisconnectedHandler(peer) {
-    peer.connection = null;
+function peerOnDisconnectedHandler(workplace) {
+    console.log("Disconnect")
 }
 
-function peerOnErrorHandler(peer, error) {
+function peerOnErrorHandler(workplace, error) {
     switch (error.type) {
         case "peer-unavailable": { console.error("Cannot connect to the given peer"); break; }
         default: console.error(error);
     }
-}
-
-// - sender
-function connectionOnDataHandler(workplace, senderConnection, data) {
-    workplace.setContent(data)
-    sendFurther(workplace, senderConnection, data);
-}
-
-function sendFurther(workplace, senderConnection, data) {
-    workplace.sendToPeers(data, [senderConnection]);
 }
