@@ -7,6 +7,7 @@ export default function WorkplaceState(setContentCallback) {
     this.setContent = setContent;
 
     this.updateContent = updateContent;
+    this.sendToPeers = sendToPeers;
 
     // Fields:
     this.content = "";
@@ -24,10 +25,15 @@ function setContent(content) {
 // updateContent is called when local changes have happened.
 function updateContent(content) {
     this.setContent(content);
+    this.sendToPeers(content);
+}
+
+function sendToPeers(content, excludeConnections = []) {
     for (const connectionId in this.peer.connections) {
         const connections = this.peer.connections[connectionId];
         for (const connection of connections) {
-            connection.send(content);
+            if (!excludeConnections.includes(connection))
+                connection.send(content);
         }
     }
 }
@@ -56,17 +62,18 @@ function createPeer(workplace) {
 // Add sender event handlers.
 function initConnectionEventHandlers(workplace, connection) {
     connection.on("open", () => workplace.peer.connection = connection);
-    connection.on("data", (data) => workplace.setContent(data));
+    connection.on("data", (data) => connectionOnDataHandler(workplace, connection, data));
 }
 
 // Event handlers
+// - receiver
 function peerOnOpenHandler(workplace) {
     const connectId = getPeerId();
     if (connectId) initConnectionEventHandlers(workplace, workplace.peer.connect(connectId));
 }
 
 function peerOnConnectionHandler(workplace, connection) {
-    connection.on("data", (data) => workplace.setContent(data));
+    connection.on("data", (data) => connectionOnDataHandler(workplace, connection, data));
     workplace.peer.connection = connection;
 }
 
@@ -79,4 +86,14 @@ function peerOnErrorHandler(peer, error) {
         case "peer-unavailable": { console.error("Cannot connect to the given peer"); break; }
         default: console.error(error);
     }
+}
+
+// - sender
+function connectionOnDataHandler(workplace, senderConnection, data) {
+    workplace.setContent(data)
+    sendFurther(workplace, senderConnection, data);
+}
+
+function sendFurther(workplace, senderConnection, data) {
+    workplace.sendToPeers(data, [senderConnection]);
 }
