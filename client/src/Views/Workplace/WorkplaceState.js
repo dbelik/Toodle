@@ -40,7 +40,7 @@ function sendToPeers(content, excludeConnections = []) {
     }
 }
 
-function getPeerId() {
+function getPeerId(workplace) {
     const search = window.location.search;
     return !search ? null : search.substring(1);
 }
@@ -56,40 +56,51 @@ function createPeer(workplace) {
 
     peer.on("open", () => peerOnOpenHandler(workplace));
     peer.on("connection", (connection) => peerOnConnectionHandler(workplace, connection));
-    peer.on("disconnected", () => peerOnDisconnectedHandler(workplace));
-    peer.on("close", () => console.log("Close"));
+    peer.on("disconnected", () => console.log("disconnected"));
     peer.on("error", (error) => peerOnErrorHandler(workplace, error));
     return peer;
 }
 
-function send(workplace, data, senderConnection = undefined) {
+function send(workplace, data, excludeConnection = undefined) {
     console.log(data);
-    workplace.sendToPeers(data, [senderConnection]);
+    workplace.sendToPeers(data, [excludeConnection]);
 }
 
 function close(workplace, connection) {
-    console.log("close");
+    // Stop tracking of peer that has been disconnected.
     workplace.peerIds.splice(workplace.peerIds.indexOf(connection.peer), 1);
-    send(workplace, workplace.peerIds);
+    // Send new peer array to peers.
+    setTimeout(() => send(workplace, workplace.peerIds), 10);
 }
 
 function receive(workplace, data, connection = undefined) {
-    console.log(data);
+    switch (typeof data) {
+        case "string": { workplace.setContent(data); break; }
+        default: workplace.peerIds = data;
+    }
     send(workplace, data, connection);
+}
+
+function connect(workplace, id) {
+    initConnectionEventHandlers(workplace, workplace.peer.connect(id));
+}
+
+function choose(workplace) {
+    return workplace.peerIds.length > 0 ? workplace.peerIds[0] : null;
 }
 
 // Add sender event handlers.
 function initConnectionEventHandlers(workplace, connection) {
     connection.on("open", () => console.log("Connection is open"));
     connection.on("data", (data) => receive(workplace, data, connection));
-    connection.on("close", () => console.log("close"));
+    connection.on("close", () => connectionCloseHandler(workplace, connection));
+    connection.on("disconnected", () => console.log("disconnected"));
 }
 
 // Event handlers
-// - receiver
 function peerOnOpenHandler(workplace) {
-    const connectId = getPeerId();
-    if (connectId) initConnectionEventHandlers(workplace, workplace.peer.connect(connectId));
+    const connectId = getPeerId(workplace);
+    if (connectId) connect(workplace, connectId);
 }
 
 function peerOnConnectionHandler(workplace, connection) {
@@ -97,14 +108,11 @@ function peerOnConnectionHandler(workplace, connection) {
     workplace.peerIds.push(connection.peer);
 
     connection.on("data", (data) => receive(workplace, data, connection));
-    connection.on("close", () => close(workplace, connection));
+    connection.on("close", () => close(workplace, connection, true));
+    connection.on("disconnected", () => console.log("disconnected"));
 
     // Some time has to pass before sending message to the peer.
-    setTimeout(() => send(workplace, workplace.peerIds), 1);
-}
-
-function peerOnDisconnectedHandler(workplace) {
-    console.log("Disconnect")
+    setTimeout(() => send(workplace, workplace.peerIds), 10);
 }
 
 function peerOnErrorHandler(workplace, error) {
@@ -112,4 +120,10 @@ function peerOnErrorHandler(workplace, error) {
         case "peer-unavailable": { console.error("Cannot connect to the given peer"); break; }
         default: console.error(error);
     }
+}
+
+function connectionCloseHandler(workplace, connection) {
+    console.log("close");
+    close(workplace, connection);
+    connect(workplace, choose(workplace));
 }
