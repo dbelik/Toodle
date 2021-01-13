@@ -36,7 +36,9 @@ export default class Broadcast {
 
     // Choose next potential outcomming peer.
     choose() {
-        return this.peerIds.length > 0 ? this.peerIds[0] : null;
+        if (this.peerIds.length > 1) { // At least two peers must be in the network.
+            return this.peerIds[0] !== this.peer.id ? this.peerIds[0] : null;
+        }
     }
 
     // Connect to a peer.
@@ -88,8 +90,6 @@ export default class Broadcast {
         connection.on("data", (data) => {
             if (this._onData) this._onData(data);
 
-            console.log(data);
-
             switch (data.type) {
                 case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data), 1); break; }
                 case "connection": { this.peerIds.push(data.data); break; }
@@ -103,15 +103,18 @@ export default class Broadcast {
     _bindOnClose(connection, excludeFrom) {
         connection.on("close", () => {
             if (excludeFrom) excludeFrom.splice(excludeFrom.indexOf(connection), 1);
-            this.peerIds.splice(this.peerIds.indexOf(connection.id), 1);
+            this.peerIds.splice(this.peerIds.indexOf(connection.peer), 1);
             this.broadcast(this.format.close(connection.peer), [connection]);
+
+            console.log(this.peerIds);
         })
     }
 
     _bindOnCloseChoose(connection) {
         connection.on("close", () => {
             const peer = this.choose();
-            if (peer) this.connect(peer);
+            if (!peer) return;
+            this.connect(peer);
         });
     }
 
