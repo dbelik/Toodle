@@ -23,20 +23,29 @@ export default class Broadcast {
     }
     
     // Operations on connections.
+    // Send data to a specific peer.
     send(connection, data) {
         connection.send(data);
     }
 
+    // Send data to all (not excluded) peers.
     broadcast(content, exclude = []) {
         this.inConnections.forEach((connection) => { if (!exclude.includes(connection)) this.send(connection, content); });
         this.outConnections.forEach((connection) => { if (!exclude.includes(connection)) this.send(connection, content); });
     }
 
+    // Choose next potential outcomming peer.
+    choose() {
+        return this.peerIds.length > 0 ? this.peerIds[0] : null;
+    }
+
+    // Connect to a peer.
     connect(id) {
         const connection = this.peer.connect(id);
         connection.on("open", () => {
             this._bindOnData(connection);
             this._bindOnClose(connection, this.outConnections);
+            this._bindOnCloseChoose(connection);
 
             this.outConnections.push(connection);
             this.peerIds.push(connection.peer);
@@ -48,6 +57,8 @@ export default class Broadcast {
     // Event bindings.
     _bindOnOpen() {
         this.peer.on("open", () => {
+            this.peerIds.push(this.peer.id);
+
             this._bindOnError();
             this._bindOnConnection();
             this._bindOnDisconnect();
@@ -64,6 +75,7 @@ export default class Broadcast {
         this.peer.on("connection", (connection) => {
             this._bindOnData(connection);
             this._bindOnClose(connection, this.inConnections);
+            this._bindOnOpenConnection(connection);
 
             this.inConnections.push(connection);
             this.peerIds.push(connection.peer);
@@ -75,10 +87,11 @@ export default class Broadcast {
     _bindOnData(connection) {
         connection.on("data", (data) => {
             if (this._onData) this._onData(data);
-            
+
             switch (data.type) {
                 case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data)); break; }
                 case "connection": { this.peerIds.push(data.data); break; }
+                case "table": { this.peerIds = data.data; return; } // Don't broadcast peers table.
             }
 
             this.broadcast(data, [connection]);
@@ -87,9 +100,23 @@ export default class Broadcast {
 
     _bindOnClose(connection, excludeFrom) {
         connection.on("close", () => {
+            console.log("closed")
             if (excludeFrom) excludeFrom.splice(excludeFrom.indexOf(connection), 1);
             this.broadcast(this.format.close(connection.peer), [connection]);
         })
+    }
+
+    _bindOnCloseChoose(connection) {
+        connection.on("close", () => {
+            const peer = this.choose();
+            if (peer) this.connect(peer);
+        });
+    }
+
+    _bindOnOpenConnection(connection) {
+        connection.on("open", () => {
+            this.send(connection, this.format.table(this.peerIds));
+        });
     }
 
     _bindOnDisconnect() {

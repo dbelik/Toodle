@@ -39,6 +39,7 @@ export default function Workplace() {
             </Helmet>
 
             <Menu urlId={urlId} />
+            <button onClick={() => console.log(broadcast?.peerIds)}>Peers</button>
             <Editor onChange={(content) => {
                 setContent(content);
                 broadcast.broadcast(broadcast.format.content(content));
