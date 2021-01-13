@@ -79,7 +79,7 @@ export default class Broadcast {
 
             this.inConnections.push(connection);
             this.peerIds.push(connection.peer);
-            
+
             this.broadcast(this.format.connection(connection.peer), [connection]);
         });
     }
@@ -88,8 +88,10 @@ export default class Broadcast {
         connection.on("data", (data) => {
             if (this._onData) this._onData(data);
 
+            console.log(data);
+
             switch (data.type) {
-                case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data)); break; }
+                case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data), 1); break; }
                 case "connection": { this.peerIds.push(data.data); break; }
                 case "table": { this.peerIds = data.data; return; } // Don't broadcast peers table.
             }
@@ -100,8 +102,8 @@ export default class Broadcast {
 
     _bindOnClose(connection, excludeFrom) {
         connection.on("close", () => {
-            console.log("closed")
             if (excludeFrom) excludeFrom.splice(excludeFrom.indexOf(connection), 1);
+            this.peerIds.splice(this.peerIds.indexOf(connection.id), 1);
             this.broadcast(this.format.close(connection.peer), [connection]);
         })
     }
