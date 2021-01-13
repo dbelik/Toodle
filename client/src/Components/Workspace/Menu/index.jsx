@@ -2,30 +2,15 @@ import React from 'react';
 
 import SimpleButton from '../../Misc/SimpleButton';
 
-function getShareLink(peer) {
-    const connectId = getConnectId(peer);
-    return `${window.location.protocol}//${window.location.host}/workplace?${connectId}`;
-}
-
-async function copyShareLink(peer) {
-    const link = getShareLink(peer);
+async function copyShareLink(urlId) {
+    const link = `${window.location.protocol}//${window.location.host}/workplace?${urlId}`;
     await navigator.clipboard.writeText(link);
 }
 
-function getPeerId() {
-    const search = window.location.search;
-    return !search || search === "" ? null : search.substring(1);
-}
-
-function getConnectId(peer) {
-    const urlId = getPeerId();
-    return urlId ? urlId : peer._id;
-}
-
-export default function Menu({ peer }) {
+export default function Menu({ urlId }) {
     return (
         <ul className="content-container py-2 px-4">
-            <li><SimpleButton onClick={() => copyShareLink(peer)}>Share link</SimpleButton></li>
+            <li><SimpleButton onClick={() => copyShareLink(urlId)}>Share link</SimpleButton></li>
         </ul>
     );
 }
