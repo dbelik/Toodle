@@ -17,6 +17,7 @@
     * { box-sizing: border-box; }
 
     body, a { color: theme("colors.text"); }
+    a:hover, a:focus { color: theme("colors.primary"); }
     h1 { font-size: theme("sizes.headers.h1"); margin-bottom: theme("spacings.margins.h1"); }
     h2 { font-size: theme("sizes.headers.h2"); margin-bottom: theme("spacings.margins.h2"); }
     h3 { font-size: theme("sizes.headers.h3"); margin-bottom: theme("spacings.margins.h3"); }

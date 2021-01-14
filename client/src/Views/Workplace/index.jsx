@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from "react-router-dom";
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import Editor from "../../Components/Workspace/Editor";
