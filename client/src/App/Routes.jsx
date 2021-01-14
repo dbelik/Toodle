@@ -5,6 +5,7 @@ import browserHistory from "../browserHistory";
 
 import Home from "../Views/Home";
 import Workplace from "../Views/Workplace";
+import Profile from "../Views/Profile";
 import NotFound from "../Views/NotFound";
 
 export default function Routes() {
@@ -12,6 +13,7 @@ export default function Routes() {
         <Router history={browserHistory}>
             <Switch>
                 <Route exact path="/"><Home /></Route>
+                <Route exact path="/profile"><Profile /></Route>
                 <Route exact path="/workplace/:id?"><Workplace /></Route>
                 
                 <Route><NotFound /></Route>

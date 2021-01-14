@@ -6,7 +6,8 @@ module.exports = {
       margins: {
         h1: "0.75rem",
         h2: "0.5rem",
-        h3: "0.5rem"
+        h3: "0.5rem",
+        input: "0.5rem"
       }
     },
     screens: {
@@ -23,9 +24,12 @@ module.exports = {
       text: "#131516",
       secondaryText: "#555f61",
 
+      error: "#ed4337",
+
       borderPrimary: "#68ACB5"
     },
     sizes: {
+      input: "400px",
       headers: {
         h1: "48px",
         h2: "38px",

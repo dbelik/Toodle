@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from "react-router-dom";
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import Editor from "../../Components/Workspace/Editor";
@@ -17,6 +18,12 @@ export default function Workplace() {
     const [broadcast, setBroadcast] = useState(null);
 
     useEffect(() => {
+        // If user hasn't created profile yet.
+        if (!localStorage.getItem("alias")) {
+            window.location.href = "/profile";
+            return;
+        }
+
         const broadcast = new Broadcast((data) => {
             if (data.type === "content") setContent(data.data);
         });

@@ -21,9 +21,11 @@
     h2 { font-size: theme("sizes.headers.h2"); margin-bottom: theme("spacings.margins.h2"); }
     h3 { font-size: theme("sizes.headers.h3"); margin-bottom: theme("spacings.margins.h3"); }
     button, button:hover, button:focus { border: none; outline: none; }
+    input { margin-bottom: theme("spacings.margins.input"); }
 
     /* Add utility classes */
     .color-default-text { color: theme("colors.text"); }
+    .color-error { color: theme("colors.error"); }
 
     .color-primary { color: theme("colors.primary"); }
     .color-primary-content { color: theme("colors.primaryContent"); }
@@ -41,4 +43,6 @@
     .-translate-x-half { transform: translateX(-50%); }
 
     .top-6-over-5 { top: 120%; }
+
+    .mh-full { min-height: 100%; }
 }

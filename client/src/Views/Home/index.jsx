@@ -12,7 +12,7 @@ export default function Home() {
 
             <div className="w-screen h-screen flex flex-col items-center justify-center">
                 <h1 className="color-primary">Toodle</h1>
-                <PrimaryLink href="/workplace">Start working</PrimaryLink>
+                <PrimaryLink href={ !localStorage.getItem("alias") ? "/profile" : "/workplace" }>Start working</PrimaryLink>
             </div>
         </HelmetProvider>
     );
