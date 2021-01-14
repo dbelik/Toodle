@@ -1,6 +1,4 @@
 export default class DataFormat {
-    constructor() {}
-
     _dataObj(type, data) {
         return {
             type: type,

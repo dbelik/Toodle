@@ -69,7 +69,10 @@ export default class Broadcast {
 
     _bindOnError() {
         this.peer.on("error", (error) => {
-            console.error(error);
+            switch (error.type) {
+                case "peer-unavailable": { console.error("peer-unavailable"); break; }
+                default: { console.error(error); break; }
+            }
         });
     }
 
@@ -94,6 +97,8 @@ export default class Broadcast {
                 case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data), 1); break; }
                 case "connection": { this.peerIds.push(data.data); break; }
                 case "table": { this.peerIds = data.data; return; } // Don't broadcast peers table.
+
+                default: { console.log("Data has been received: ", data); }
             }
 
             this.broadcast(data, [connection]);

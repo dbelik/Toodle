@@ -20,14 +20,10 @@ export default function Workplace() {
         const broadcast = new Broadcast((data) => {
             if (data.type === "content") setContent(data.data);
         });
+        broadcast.peer.on("open", () => setUrlId(broadcast.peer.id));
 
         const urlId = getPeerId();
-        if (urlId)  {
-            broadcast.peer.on("open", () => broadcast.connect(urlId));
-            setUrlId(urlId);
-        } else {
-            broadcast.peer.on("open", () => setUrlId(broadcast.peer.id));
-        }
+        if (urlId) { broadcast.peer.on("open", () => broadcast.connect(urlId)); }
 
         setBroadcast(broadcast);
     }, []);
@@ -39,7 +35,6 @@ export default function Workplace() {
             </Helmet>
 
             <Menu urlId={urlId} />
-            <button onClick={() => console.log(broadcast?.peerIds)}>Peers</button>
             <Editor onChange={(content) => {
                 setContent(content);
                 broadcast.broadcast(broadcast.format.content(content));
