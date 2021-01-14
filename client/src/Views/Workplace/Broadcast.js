@@ -9,8 +9,9 @@ export default class Broadcast {
             host: "192.168.0.104",
             port: 9000,
             path: "/doc",
-            secure: true
+            secure: true,
         });
+        this.maxPeers = 5;
         this.inConnections = [];
         this.outConnections = [];
         this.peerIds = [];
@@ -41,6 +42,11 @@ export default class Broadcast {
         }
     }
 
+    // Can this peer connect any more peers.
+    canConnect() {
+        return this.inConnections.length + this.outConnections.length < this.maxPeers;
+    }
+
     // Connect to a peer.
     connect(id) {
         const connection = this.peer.connect(id);
@@ -54,6 +60,11 @@ export default class Broadcast {
 
             this.broadcast(this.format.connection(connection.id), [connection]);
         });
+    }
+
+    // When this peer can no longer connect peers, this function chooses peer that may connect these peers.
+    redirect(data) {
+        this.send(this.inConnections[0] || this.outConnections[0], data);
     }
 
     // Event bindings.
@@ -78,6 +89,12 @@ export default class Broadcast {
 
     _bindOnConnection() {
         this.peer.on("connection", (connection) => {
+            if (!this.canConnect()) {
+                connection.close();
+                this.redirect(this.format.redirect(connection.peer));
+                return;
+            }
+
             this._bindOnData(connection);
             this._bindOnClose(connection, this.inConnections);
             this._bindOnOpenConnection(connection);
@@ -97,10 +114,12 @@ export default class Broadcast {
                 case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data), 1); break; }
                 case "connection": { this.peerIds.push(data.data); break; }
                 case "table": { this.peerIds = data.data; return; } // Don't broadcast peers table.
+                case "redirect": { this.canConnect() ? this.connect(data.data) : this.redirect(data); return; }
 
                 default: { console.log("Data has been received: ", data); }
             }
 
+            // Send data further.
             this.broadcast(data, [connection]);
         })
     }
