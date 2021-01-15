@@ -21,6 +21,8 @@ module.exports = {
       primaryContent: "#FFFFFF",
       primaryInteract: "#5a949c",
 
+      black: "#0e1013",
+
       text: "#131516",
       secondaryText: "#555f61",
 

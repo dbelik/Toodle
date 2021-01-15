@@ -33,6 +33,7 @@
     
     .bg-primary { background-color: theme("colors.primary"); }
     .bg-primary-interact { background-color: theme("colors.primaryInteract"); }
+    .bg-black { background-color: theme("colors.black"); }
 
     .border-color-primary { border-color: theme("colors.borderPrimary"); }
 

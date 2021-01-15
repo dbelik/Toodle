@@ -14,6 +14,7 @@ export default function Editor({ onChange, value }) {
             </Helmet>
 
             <CodeMirror
+                className="z-10 pr-16"
                 onBeforeChange={(editor, data, value) => onChange(value)}
                 value={value}
                 options={{

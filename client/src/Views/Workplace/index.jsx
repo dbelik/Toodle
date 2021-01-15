@@ -116,8 +116,7 @@ export default function Workplace() {
                 <title>Toodle | Workplace</title>
             </Helmet>
 
-            <Menu urlId={urlId} />
-            <UsersList room={room} />
+            <Menu urlId={urlId} room={room} />
 
             <Editor onChange={(content) => {
                 setContent(content);
