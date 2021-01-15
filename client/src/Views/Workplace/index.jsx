@@ -23,7 +23,7 @@ function receiveContent(data, connection, room, broadcast, setContent, setRoom) 
             break; 
         }
         case "user leaves": {
-            room.leave(room.find(content.content));
+            room.leave(room.find(content.content)[0]);
             setRoom(new Room(room.users));
             break; 
         }
@@ -38,8 +38,15 @@ function receiveContent(data, connection, room, broadcast, setContent, setRoom) 
     broadcast.broadcast(data, [connection]);
 }
 
+function userLeaves(broadcast, contentFormat, room, connection, setRoom) {
+    room.leave(room.find(connection.peer)[0]);
+    setRoom(room);
+    const message = broadcast.format.content(contentFormat.userLeaves(connection.peer));
+    broadcast.broadcast(message);
+}
+
 // Bind additional events on top of existing to actually work with content.
-function bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, setUser) {
+function bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, setUser, setRoom) {
     broadcast.peer.on("open", () => {
         const user = new User(broadcast.peer.id, alias);
         // Add first user (this user) to the room.
@@ -58,9 +65,7 @@ function bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, se
                 broadcast.send(connection, content);
             });
     
-            connection.on("close", () => {
-                console.log(room);
-            });
+            connection.on("close", () => userLeaves(broadcast, contentFormat, room, connection, setRoom));
         }
 
         broadcast.peer.on("connection", (connection) => {
@@ -68,10 +73,7 @@ function bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, se
             connection.on("open", () => connection.send(broadcast.format.content(contentFormat.room(room))));
 
             // When user leaves the room, tell other users that the user has left.
-            connection.on("close", () => {
-                room.leave(room.find(connection.peer)[0])
-                broadcast.broadcast(contentFormat.userLeaves(connection.peer));
-            });
+            connection.on("close", () => userLeaves(broadcast, contentFormat, room, connection, setRoom));
         });
     });
 }
@@ -103,7 +105,7 @@ export default function Workplace() {
         const broadcast = new Broadcast((data, connection) => receiveContent(data, connection, room, broadcast, setContent, setRoom));
         const contentFormat = new ContentFormat();
         setContentFormat(contentFormat);
-        bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, setUser);
+        bindBroadcastEvents(broadcast, room, alias, contentFormat, setUrlId, setUser, setRoom);
 
         setBroadcast(broadcast);
     }, []);
