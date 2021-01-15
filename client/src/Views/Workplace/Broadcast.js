@@ -1,6 +1,6 @@
 import Peer from "peerjs";
 
-import DataFormat from "./DataFormat";
+import BroadcastFormat from "./BroadcastFormat";
 
 export default class Broadcast {
     constructor(onData = null) {
@@ -14,9 +14,9 @@ export default class Broadcast {
         this.maxPeers = 5;
         this.inConnections = [];
         this.outConnections = [];
-        this.peerIds = [];
+        this.peers = [];
 
-        this.format = new DataFormat();
+        this.format = new BroadcastFormat();
         this._onData = onData; // Method that's called when data is received.
 
         // Initialize broadcast.
@@ -37,8 +37,8 @@ export default class Broadcast {
 
     // Choose next potential outcomming peer.
     choose() {
-        if (this.peerIds.length > 1) { // At least two peers must be in the network.
-            return this.peerIds[0] !== this.peer.id ? this.peerIds[0] : null;
+        if (this.peers.length > 1) { // At least two peers must be in the network.
+            return this.peers[0] !== this.peer.id ? this.peers[0] : null;
         }
     }
 
@@ -56,10 +56,11 @@ export default class Broadcast {
             this._bindOnCloseChoose(connection);
 
             this.outConnections.push(connection);
-            this.peerIds.push(connection.peer);
+            this.peers.push(connection.peer);
 
             this.broadcast(this.format.connection(connection.id), [connection]);
         });
+        return connection;
     }
 
     // When this peer can no longer connect peers, this function chooses peer that may connect these peers.
@@ -70,7 +71,7 @@ export default class Broadcast {
     // Event bindings.
     _bindOnOpen() {
         this.peer.on("open", () => {
-            this.peerIds.push(this.peer.id);
+            this.peers.push(this.peer.id);
 
             this._bindOnError();
             this._bindOnConnection();
@@ -100,7 +101,7 @@ export default class Broadcast {
             this._bindOnOpenConnection(connection);
 
             this.inConnections.push(connection);
-            this.peerIds.push(connection.peer);
+            this.peers.push(connection.peer);
 
             this.broadcast(this.format.connection(connection.peer), [connection]);
         });
@@ -108,15 +109,14 @@ export default class Broadcast {
 
     _bindOnData(connection) {
         connection.on("data", (data) => {
-            if (this._onData) this._onData(data);
+            if (this._onData) this._onData(data, connection);
 
             switch (data.type) {
-                case "close": { this.peerIds.splice(this.peerIds.indexOf(data.data), 1); break; }
-                case "connection": { this.peerIds.push(data.data); break; }
-                case "table": { this.peerIds = data.data; return; } // Don't broadcast peers table.
+                case "close": { this.peers.splice(this.peers.indexOf(data.data), 1); break; }
+                case "connection": { this.peers.push(data.data); break; }
+                case "table": { this.peers = data.data; return; } // Don't broadcast peers table.
                 case "redirect": { this.canConnect() ? this.connect(data.data) : this.redirect(data); return; }
-
-                default: { console.log("Data has been received: ", data); }
+                case "content": return; // Content is handled outside.
             }
 
             // Send data further.
@@ -127,10 +127,8 @@ export default class Broadcast {
     _bindOnClose(connection, excludeFrom) {
         connection.on("close", () => {
             if (excludeFrom) excludeFrom.splice(excludeFrom.indexOf(connection), 1);
-            this.peerIds.splice(this.peerIds.indexOf(connection.peer), 1);
+            this.peers.splice(this.peers.indexOf(connection.peer), 1);
             this.broadcast(this.format.close(connection.peer), [connection]);
-
-            console.log(this.peerIds);
         })
     }
 
@@ -144,7 +142,7 @@ export default class Broadcast {
 
     _bindOnOpenConnection(connection) {
         connection.on("open", () => {
-            this.send(connection, this.format.table(this.peerIds));
+            this.send(connection, this.format.table(this.peers));
         });
     }
 

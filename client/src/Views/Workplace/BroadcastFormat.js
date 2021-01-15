@@ -1,4 +1,4 @@
-export default class DataFormat {
+export default class BroadcastFormat {
     _dataObj(type, data) {
         return {
             type: type,

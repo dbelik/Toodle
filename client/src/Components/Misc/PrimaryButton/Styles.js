@@ -9,6 +9,8 @@ export const StyledPrimaryBtn = styled.button`
     }
 
     :hover, :focus {
+        color: white;
+
         > div {
             transform: translateY(0%);
         }

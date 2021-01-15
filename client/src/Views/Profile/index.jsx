@@ -10,7 +10,7 @@ function setCurrentAlias(alias) {
 }
 
 function getAliases() {
-    return JSON.parse(localStorage.getItem("aliases"));
+    return JSON.parse(localStorage.getItem("aliases")) || [];
 }
 
 function addAlias(alias) {
