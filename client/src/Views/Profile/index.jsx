@@ -74,7 +74,7 @@ export default function Profile() {
                 { aliases?.length > 0 ? <h3>Here are some suggestions:</h3> : "" }
 
                 <ul className="text-center">
-                    { aliases?.map((value, i) => <li key={i}><a href="" onClick={(event) => SuggestionClick(event, value)}>{value}</a></li>)}
+                    { aliases?.map((value, i) => <li key={i}><a href="#" onClick={(event) => SuggestionClick(event, value)}>{value}</a></li>)}
                 </ul>
             </div>
         </HelmetProvider>

@@ -117,6 +117,7 @@ export default class Broadcast {
                 case "table": { this.peers = data.data; return; } // Don't broadcast peers table.
                 case "redirect": { this.canConnect() ? this.connect(data.data) : this.redirect(data); return; }
                 case "content": return; // Content is handled outside.
+                default: console.log("Unknown data:"); console.log(data);
             }
 
             // Send data further.

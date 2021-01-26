@@ -6,7 +6,7 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './toodle-theme.css';
 
-export default function Editor({ onChange, value }) {
+export default function Editor({ onBeforeChange, value }) {
     return (
         <Fragment>
             <Helmet>
@@ -15,13 +15,15 @@ export default function Editor({ onChange, value }) {
 
             <CodeMirror
                 className="z-10 pr-16"
-                onBeforeChange={(editor, data, value) => onChange(value)}
                 value={value}
                 options={{
                     lineWrapping: true,
                     lineNumbers: true,
                     mode: "markdown"
-                }} />
+                }}
+
+                onBeforeChange={onBeforeChange}
+                />
         </Fragment>
     )
 }
